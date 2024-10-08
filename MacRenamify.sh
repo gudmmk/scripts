@@ -1,8 +1,13 @@
 #!/bin/bash
 #
 # Note: 
-#  - This script requires access to the Microsoft Graph API, it needs the "User.Read.All" Application permission.
 #  - The script assumes that there's only one account per computer that has the Company Portal installed.
+#  - This script requires access to the Microsoft Graph API, it needs the "User.Read.All" Application permission.
+#    * Register the App in Entra ID.
+#  	   - Go to Entra ID > App registrations > New registration.
+#      - Note down the Application (client) ID and Directory (tenant) ID.
+#      - Generate and save the Client Secret.
+#      - Under API Permissions, add a Microsoft Graph Application Permission and grant the User.Read.All to the application
 #
 # Disclaimer:
 #  - The script is provided AS IS without warranty of any kind.
@@ -12,9 +17,9 @@
 
 DOMAIN_NAME="contoso.com"
 COMPANY_NAME="Contoso"
-TENANT_ID=""
-CLIENT_ID=""
-CLIENT_SECRET=""
+TENANT_ID="Directory (tenant) ID"
+CLIENT_ID="Application (client) ID"
+CLIENT_SECRET="Client secret (Value)"
 GRAPH_SCOPE="https://graph.microsoft.com/.default"
 SCRIPT_NAME="MacRenamify"
 LOG_DIR="/Library/Logs/Microsoft/IntuneScripts/${SCRIPT_NAME}"
