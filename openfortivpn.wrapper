@@ -1,0 +1,44 @@
+#!/bin/bash
+#
+#-------------------------------------------------------------------------------------------------------------
+#  2025/03/20 - Gudmudnur Mar Kristjansson <gummk@gmail.com>
+#
+#  Basic wrapper script for openfortivpn to automatically open the SAML authentication URL in a browser.
+#  If you want to avoid entering the sudo password when you connect to the vpn then something like this
+#  can be added to a file in /etc/sudoers.d/
+#
+#  YOUR_USERNAME ALL=(ALL) NOPASSWD: /path/to/openfortivpn/binary --saml-login -c /path/to/vpn/config/file
+#
+#-------------------------------------------------------------------------------------------------------------
+
+CONFIG_FILE="~/openfortivpn.conf"
+LOG_FILE="~/openfortivpn.log"
+
+# Clear the log file before running
+truncate -s0 "${LOG_FILE}"
+
+# Start openfortivpn in the background
+sudo openfortivpn --saml-login -c "${CONFIG_FILE}" 2>&1 | tee -a "${LOG_FILE}" &
+
+# Capture the process ID
+VPN_PID=$!
+
+echo "Waiting for authentication URL."
+sleep 2  # Add a small delay to let openfortivpn properly start
+
+# Monitor the log file for the URL
+while true; do
+    AUTH_URL=$(grep -oE "https://[^']+" "${LOG_FILE}" | head -n 1)
+    if [[ -n "${AUTH_URL}" ]]; then
+        echo "Opening authentication URL: $AUTH_URL"
+        xdg-open "${AUTH_URL}"  # macOS: 'open', Linux: 'xdg-open'
+        break
+    fi
+    sleep 1
+done
+
+# Allow time for authentication to complete
+sleep 5  # You can adjust this if needed
+
+# Resume foreground process
+wait "${VPN_PID}"
